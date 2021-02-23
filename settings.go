@@ -5,11 +5,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-type ServerConfig struct {
+type Config struct {
 	Port string
 }
 
-func loadEnv(file string, path string, typeFile string) (*ServerConfig, error) {
+func loadEnv(file string, path string, typeFile string) (*Config, error) {
 	viper.SetConfigName(file)
 	viper.AddConfigPath(path)
 	viper.AutomaticEnv()
@@ -20,9 +20,9 @@ func loadEnv(file string, path string, typeFile string) (*ServerConfig, error) {
 	}
 	port, ok := viper.Get("SERVER.PORT").(string)
 	if !ok {
-		return nil, fmt.Errorf("Invalid type assertion")
+		return nil, fmt.Errorf("invalid type assertion")
 	}
-	config := ServerConfig{Port: port}
+	config := Config{Port: port}
 
 	return &config, nil
 }
