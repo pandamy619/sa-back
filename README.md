@@ -13,3 +13,14 @@
 Запуск pre-commit hooks для всех файлов проекта:
 
     pre-commit run --all-files
+
+
+## Run server
+
+Создание исполняемого файла
+
+    go build -o sa-back
+
+Запуск исполняемого файла
+
+    ./sa-back
