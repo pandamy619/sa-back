@@ -5,8 +5,17 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Config struct {
+type Server struct {
 	Port string
+}
+
+type FileManager struct {
+	TempDir string
+}
+
+type Config struct {
+	Server      Server
+	FileManager FileManager
 }
 
 func loadEnv(file string, path string, typeFile string) (*Config, error) {
@@ -22,7 +31,16 @@ func loadEnv(file string, path string, typeFile string) (*Config, error) {
 	if !ok {
 		return nil, fmt.Errorf("invalid type assertion")
 	}
-	config := Config{Port: port}
+	tmpDir, ok := viper.Get("FILE.TMPDIR").(string)
+
+	config := Config{
+		Server: Server{
+			Port: port,
+		},
+		FileManager: FileManager{
+			TempDir: tmpDir,
+		},
+	}
 
 	return &config, nil
 }

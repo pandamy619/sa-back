@@ -20,7 +20,7 @@ func main() {
 	mux := http.NewServeMux()
 	handlers(mux)
 
-	if err := http.ListenAndServe(":"+config.Port, mux); err != nil {
+	if err := http.ListenAndServe(":"+config.Server.Port, mux); err != nil {
 		log.Fatal(err)
 	}
 

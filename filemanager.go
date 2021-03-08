@@ -15,6 +15,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	file, _, err := r.FormFile("file")
+
 	if err != nil {
 		fmt.Println("Error Retrieving the File")
 		fmt.Println(err)
@@ -22,25 +23,35 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
+	_, err = GetFileContentType(file)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	path, err := tempDir("./tmp/", "")
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	tmpFile, err := tempFile(path, "upload-*.xlsx")
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	defer tmpFile.Close()
 
 	fileBytes, err := readAll(file)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	b, err := tmpFile.Write(fileBytes)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
-	fmt.Printf("Wrote %d bytes", b)
+	fmt.Printf("Wrote %d bytes\n", b)
 }
 
 // TempDir creates a new temporary directory in the directory dir.
@@ -70,4 +81,14 @@ func readAll(file multipart.File) ([]byte, error) {
 		return nil, err
 	}
 	return fileBytes, nil
+}
+
+func GetFileContentType(file multipart.File) (string, error) {
+	buffer := make([]byte, 512)
+	_, err := file.Read(buffer)
+	if err != nil {
+		return "", err
+	}
+	contentType := http.DetectContentType(buffer)
+	return contentType, nil
 }
