@@ -1,12 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
 )
+
+type Resp struct {
+	Message     string `json:"message"`
+	Description string `json:"description"`
+	Code int `json:"code"`
+}
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse our multipart form, 10 << 20 specifies a maximum
@@ -51,7 +58,19 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	fmt.Printf("Wrote %d bytes\n", b)
+
+	resp, err := json.Marshal(
+		Resp{
+			Message:     "File uploaded successfully",
+			Description: fmt.Sprintf("Wrote %d bytes", b),
+			Code: 200,
+		})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_, _ = w.Write(resp)
 }
 
 // TempDir creates a new temporary directory in the directory dir.
