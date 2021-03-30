@@ -24,41 +24,39 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	file, _, err := r.FormFile("file")
 
 	if err != nil {
-		fmt.Println("Error Retrieving the File")
-		fmt.Println(err)
+		ErrorJson(w, Error{Err: err, Message: "Error Retrieving the File", Code: 400}, 400)
 		return
 	}
 	defer file.Close()
 
 	_, err = GetFileContentType(file)
 	if err != nil {
-		fmt.Println(err)
+		ErrorJson(w, Error{Err: err, Message: "", Code: 400}, 400)
 		return
 	}
 
 	path, err := tempDir("./tmp/", "")
 	if err != nil {
-		fmt.Println(err)
+		ErrorJson(w, Error{Err: err, Message: "", Code: 400}, 400)
 		return
 	}
 	tmpFile, err := tempFile(path, "upload-*.xlsx")
 	if err != nil {
-		fmt.Println(err)
+		ErrorJson(w, Error{Err: err, Message: "", Code: 400}, 400)
 		return
 	}
 	defer tmpFile.Close()
 
 	fileBytes, err := readAll(file)
 	if err != nil {
-		fmt.Println(err)
+		ErrorJson(w, Error{Err: err, Message: "", Code: 400}, 400)
 		return
 	}
 	b, err := tmpFile.Write(fileBytes)
 	if err != nil {
-		fmt.Println(err)
+		ErrorJson(w, Error{Err: err, Message: "", Code: 400}, 400)
 		return
 	}
-
 	resp, err := json.Marshal(
 		Resp{
 			Message:     "File uploaded successfully",
@@ -66,7 +64,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 			Code: 200,
 		})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		ErrorJson(w, Error{Err: err, Message: "", Code: http.StatusInternalServerError}, http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
