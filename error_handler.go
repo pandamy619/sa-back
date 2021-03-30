@@ -7,9 +7,9 @@ import (
 
 // Error entity
 type Error struct {
-	Err     error  `json:"error"`
-	Message string `json:"description"`
-	Code    int    `json:"code"`
+	Err         error  `json:"error"`
+	Description string `json:"description"`
+	Code        int    `json:"code"`
 }
 
 // ErrorJson replies to the request with the specified error message and HTTP code.
