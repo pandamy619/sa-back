@@ -7,13 +7,14 @@ import (
 
 // Error entity
 type Error struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
+	Code      string `json:"code"`
+	Message   string `json:"message"`
+	Timestamp string `json:"timestamp"`
 }
 
 // NewError generates an error in json format.
 func NewError(w http.ResponseWriter, error string, code int) {
-	err := Error{Code: error, Message: error}
+	err := Error{Code: error, Message: error, Timestamp: getTimestamp()}
 	errorJson(w, err, code)
 }
 
