@@ -1,12 +1,19 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
 )
+
+type Resp struct {
+	Message     string `json:"message"`
+	Description string `json:"description"`
+	Code        int    `json:"code"`
+}
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse our multipart form, 10 << 20 specifies a maximum
@@ -17,41 +24,51 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	file, _, err := r.FormFile("file")
 
 	if err != nil {
-		fmt.Println("Error Retrieving the File")
-		fmt.Println(err)
+		NewError(w, "Error Retrieving the File", 400)
 		return
 	}
 	defer file.Close()
 
 	_, err = GetFileContentType(file)
 	if err != nil {
-		fmt.Println(err)
+		NewError(w, err.Error(), 400)
 		return
 	}
 
 	path, err := tempDir("./tmp/", "")
 	if err != nil {
-		fmt.Println(err)
+		NewError(w, err.Error(), 400)
 		return
 	}
 	tmpFile, err := tempFile(path, "upload-*.xlsx")
 	if err != nil {
-		fmt.Println(err)
+		NewError(w, err.Error(), 400)
 		return
 	}
 	defer tmpFile.Close()
 
 	fileBytes, err := readAll(file)
 	if err != nil {
-		fmt.Println(err)
+		NewError(w, err.Error(), 400)
 		return
 	}
 	b, err := tmpFile.Write(fileBytes)
 	if err != nil {
-		fmt.Println(err)
+		NewError(w, err.Error(), 400)
 		return
 	}
-	fmt.Printf("Wrote %d bytes\n", b)
+	resp, err := json.Marshal(
+		Resp{
+			Message:     "File uploaded successfully",
+			Description: fmt.Sprintf("Wrote %d bytes", b),
+			Code:        200,
+		})
+	if err != nil {
+		NewError(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_, _ = w.Write(resp)
 }
 
 // TempDir creates a new temporary directory in the directory dir.
