@@ -7,18 +7,23 @@ import (
 
 // Error entity
 type Error struct {
-	Err         error  `json:"error"`
-	Description string `json:"description"`
-	Code        int    `json:"code"`
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+// NewError generates an error in json format.
+func NewError(w http.ResponseWriter, error string, code int) {
+	err := Error{Code: error, Message: error}
+	errorJson(w, err, code)
 }
 
 // ErrorJson replies to the request with the specified error message and HTTP code.
 // It does not otherwise end the request; the caller should ensure no further
 // writes are done to w.
 // The error message should be json.
-func ErrorJson(w http.ResponseWriter, err interface{}, code int) {
+func errorJson(w http.ResponseWriter, err interface{}, code int) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(err)
+	_ = json.NewEncoder(w).Encode(err)
 }
