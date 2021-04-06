@@ -1,8 +1,9 @@
 #!/bin/bash
 
-FILES = $(go list ./... | grep -v /vendor/)
-
-go test -tags=unit -timeout 30s -short -v ${FILES}
+# shellcheck disable=SC2093
+# shellcheck disable=SC2046
+# shellcheck disable=SC2094
+go test $(go list ./... | grep -v /vendor/)
 
 returncode=$?
 if [ $returncode -ne 0 ]; then
