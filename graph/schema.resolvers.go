@@ -22,6 +22,14 @@ func (r *queryResolver) Fields(ctx context.Context) ([]*model.Field, error) {
 	return Fields, nil
 }
 
+func (r *queryResolver) PercentGroups(ctx context.Context) ([]*model.PercentGroup, error) {
+	pgA := model.PercentGroup{Name: "A", Percent: 80}
+	pgB := model.PercentGroup{Name: "B", Percent: 15}
+	pgC := model.PercentGroup{Name: "C", Percent: 5}
+	pg := []*model.PercentGroup{&pgA, &pgB, &pgC}
+	return pg, nil
+}
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
