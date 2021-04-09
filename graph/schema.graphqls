@@ -2,6 +2,13 @@ type Field {
   name: String!
 }
 
+type PercentGroup {
+  name: String!
+  percent: Float!
+}
+
+
 type Query {
   Fields: [Field!]!
+  PercentGroups: [PercentGroup!]!
 }
