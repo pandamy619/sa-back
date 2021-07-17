@@ -13,7 +13,7 @@ import (
 )
 
 func TestUpload(t *testing.T) {
-	path := "./config.yaml"
+	path := "./data/test.csv"
 	file, err := os.Open(path)
 	if err != nil {
 		t.Error(err)

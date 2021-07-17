@@ -7,6 +7,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 type Resp struct {
@@ -21,13 +22,18 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	file, _, err := r.FormFile("file")
+	file, handler, err := r.FormFile("file")
 
 	if err != nil {
 		NewError(w, "Error Retrieving the File", 400)
 		return
 	}
 	defer file.Close()
+
+	fileExt := filepath.Ext(handler.Filename)
+	if fileExt != ".xlsx" && fileExt != ".csv" {
+		NewError(w, "Invalid file format", 415)
+	}
 
 	_, err = GetFileContentType(file)
 	if err != nil {
